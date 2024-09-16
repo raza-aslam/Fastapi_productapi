@@ -8,7 +8,7 @@ config = Config(".env")
 db:str = config("DATABASE_URL",cast=str)
 cloud_name: str = config("CLOUDINARY_CLOUD_NAME")
 api_key:str= config("CLOUDINARY_API_KEY")
-api_secret:str=config("CLOUDINARY_API_SECRET")
+api_secret:str=config("CLOUDINARY_SECRET_KEY")
 cloudinary.config(
   cloud_name = cloud_name,
   api_key = api_key,
