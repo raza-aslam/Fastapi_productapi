@@ -6,11 +6,13 @@ import cloudinary # type: ignore
 
 config = Config(".env")
 db:str = config("DATABASE_URL",cast=str)
-
+cloud_name: str = config("CLOUDINARY_CLOUD_NAME")
+api_key:str= config("CLOUDINARY_API_KEY")
+api_secret:str=config("CLOUDINARY_API_SECRET")
 cloudinary.config(
-  cloud_name = "dhsfqpxlt",
-  api_key = "415496698592747",
-  api_secret = "LnKk2Xwoydkchx7fjMiTfBqhhVU"
+  cloud_name = cloud_name,
+  api_key = api_key,
+  api_secret = api_secret
 )
 
 connection_string:str = db.replace("postgresql","postgresql+psycopg2")

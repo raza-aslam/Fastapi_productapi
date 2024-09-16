@@ -3,7 +3,12 @@ from fastapi import FastAPI
 from approute.routes import router
 from fastapi.middleware.cors import CORSMiddleware
 
-app  = FastAPI(lifespan= create_tables)
+app  = FastAPI(lifespan= create_tables,
+               servers=[{
+                   "url": "https://fastapiproductapi-production.up.railway.app/",
+                   "description": "Development Server"
+               }]
+               )
 
 app.add_middleware(
     CORSMiddleware,
