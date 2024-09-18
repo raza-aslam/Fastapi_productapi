@@ -1,7 +1,7 @@
 from typing import List, Optional
 from fastapi import APIRouter,File, Form, HTTPException,Depends,UploadFile
 from sqlmodel import Session, select
-from models.product_model import Product
+from models.product_model import  Product
 from Database.setting import engine 
 import cloudinary #type:ignore
 import cloudinary.uploader #type:ignore
@@ -68,21 +68,38 @@ def get_product(product_id: int):
 
 # Update a product by ID
 @router.put("/products/{product_id}")
-def update_product(product_id: int, product: Product):
-    with Session(engine) as session:
-        db_product = session.get(Product, product_id)
-        if not db_product:
-            raise HTTPException(status_code=404, detail="Product not found")
-        
-        db_product.product_name = product.product_name
-        db_product.product_description = product.product_description
-        db_product.product_image = product.product_image
-        
+async def update_product(
+    product_id: int,
+    product_name: str = Form(...),
+    product_description: str = Form(...),
+    category_names: Optional[List[str]] = Form(...),
+    file: Optional[UploadFile] = None,
+):
+    try:
+        with Session(engine) as session:
+            # Fetch the existing product
+            db_product = session.get(Product, product_id)
+            if not db_product:
+                raise HTTPException(status_code=404, detail="Product not found")
 
-        session.add(db_product)
-        session.commit()
-        session.refresh(db_product)
-        return db_product
+            # Update product fields
+            db_product.product_name = product_name
+            db_product.product_description = product_description
+            db_product.category_names = category_names or []
+            # If a new image file is uploaded, upload it to Cloudinary
+            if file:
+                file_bytes = await file.read()
+                upload_result = cloudinary.uploader.upload(file_bytes)
+                db_product.product_image = upload_result.get("url")  # Update product_image with the Cloudinary URL
+
+            # Commit the changes to the database
+            session.add(db_product)
+            session.commit()
+            session.refresh(db_product)
+            return db_product
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error updating product: {str(e)}")
 
 # Delete a product by ID
 @router.delete("/products/{product_id}")
