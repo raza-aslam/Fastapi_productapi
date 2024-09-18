@@ -5,8 +5,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app  = FastAPI(lifespan= create_tables,
                servers=[{
-                   "url": "http://127.0.0.1:8000",
-                   "description": "Development Server"
+                   "url": "https://fastapiproductapi-production.up.railway.app/",
+                   "description": "Production"
                }]
                )
 
